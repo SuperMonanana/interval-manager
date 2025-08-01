@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class IntervalManager {
-    LinkedList<Interval> intervals = new LinkedList<>(); // intervals sorted by start time
+    private final LinkedList<Interval> intervals = new LinkedList<>(); // intervals sorted by start time
 
     /**
      * @param interval Adds a new interval. Automatically merge overlapping or adjacent intervals.
@@ -64,7 +64,7 @@ public class IntervalManager {
             }
 
             if (removeStart <= current.start && removeEnd >= current.end) {
-                // Entire current interval is removed
+                // Remove entire current interval
                 iterator.remove();
             } else if (removeStart <= current.start) {
                 // Trim start
@@ -90,8 +90,8 @@ public class IntervalManager {
     }
 
     private static class Interval {
-        int start;
-        int end;
+        private int start;
+        private int end;
 
         Interval(int start, int end) {
             this.start = start;
