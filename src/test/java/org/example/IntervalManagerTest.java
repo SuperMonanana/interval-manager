@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class IntervalManagerTest {
 
     @Test
-    void testAddDisjointIntervals() {
+    void addInterval_WithDisjointIntervals_ShouldMaintainSortedOrder() {
         IntervalManager manager = new IntervalManager();
         manager.addInterval(new int[]{4, 5}); // add to empty
         manager.addInterval(new int[]{1, 2}); // add to the head
@@ -68,6 +68,57 @@ class IntervalManagerTest {
         manager.addInterval(new int[]{1, 5});
 
         assertIntervalsEqual(manager.getIntervals(), new int[][]{{1, 5}});
+    }
+
+    @Test
+    void testRemoveNoOp() {
+        IntervalManager manager = new IntervalManager();
+        manager.addInterval(new int[]{1, 5});
+        manager.removeInterval(new int[]{6, 10});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{1, 5}});
+    }
+
+    @Test
+    void testRemoveEntireInterval() {
+        IntervalManager manager = new IntervalManager();
+        manager.addInterval(new int[]{1, 5});
+        manager.removeInterval(new int[]{0, 10});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{});
+    }
+
+    @Test
+    void testRemoveTrimStart() {
+        IntervalManager manager = new IntervalManager();
+        manager.addInterval(new int[]{1, 5});
+        manager.removeInterval(new int[]{1, 3});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{3, 5}});
+    }
+
+    @Test
+    void testRemoveTrimEnd() {
+        IntervalManager manager = new IntervalManager();
+        manager.addInterval(new int[]{1, 5});
+        manager.removeInterval(new int[]{3, 5});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{1, 3}});
+    }
+
+    @Test
+    void testRemoveMiddlePartSplitsInterval() {
+        IntervalManager manager = new IntervalManager();
+        manager.addInterval(new int[]{1, 10});
+        manager.removeInterval(new int[]{3, 5});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{1, 3}, {5, 10}});
+    }
+
+    @Test
+    void testRemoveMultiple() {
+        IntervalManager manager = new IntervalManager();
+        manager.addInterval(new int[]{1, 3}); // no op
+        manager.addInterval(new int[]{5, 7}); // should trim end
+        manager.addInterval(new int[]{8, 9}); // should remove entirely
+        manager.addInterval(new int[]{10, 15}); // should trim start
+        manager.removeInterval(new int[]{6, 12});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{1, 3}, {5, 6}, {12, 15}});
     }
 
     private void assertIntervalsEqual(List<int[]> actual, int[][] expected) {
