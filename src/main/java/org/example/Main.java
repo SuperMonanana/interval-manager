@@ -18,12 +18,10 @@ public class Main {
                         .toList()); // Output: [[1, 7]]
 
         // Example for remove
-        IntervalManager removeManager = new IntervalManager();
-        removeManager.addInterval(new int[]{1, 10});
-        removeManager.removeInterval(new int[]{3, 5});
+        manager.removeInterval(new int[]{3, 5});
         System.out.println("Intervals: " +
-                removeManager.getIntervals().stream()
+                manager.getIntervals().stream()
                         .map(Arrays::toString)
-                        .toList()); // Output: [[1, 3], [5, 10]
+                        .toList()); // Output: [[1, 3], [5, 7]
     }
 }
