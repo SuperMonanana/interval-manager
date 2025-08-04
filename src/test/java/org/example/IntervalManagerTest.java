@@ -4,8 +4,33 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IntervalManagerTest {
+
+    @Test
+    void addInterval_WithNullInput_ShouldThrowIllegalArgumentException() {
+        IntervalManager manager = new IntervalManager();
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> manager.addInterval(null));
+        assertEquals("Interval must have length 2", exception.getMessage());
+    }
+
+    @Test
+    void addInterval_WithWrongLength_ShouldThrowIllegalArgumentException() {
+        IntervalManager manager = new IntervalManager();
+        Exception exception1 = assertThrows(IllegalArgumentException.class, () -> manager.addInterval(new int[]{1}));
+        assertEquals("Interval must have length 2", exception1.getMessage());
+
+        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> manager.addInterval(new int[]{1, 2, 3}));
+        assertEquals("Interval must have length 2", exception2.getMessage());
+    }
+
+    @Test
+    void addInterval_WithStartGreaterThanEnd_ShouldThrowIllegalArgumentException() {
+        IntervalManager manager = new IntervalManager();
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> manager.addInterval(new int[]{5, 3}));
+        assertEquals("Start must be less than or equal to end", exception.getMessage());
+    }
 
     @Test
     void addInterval_WithDisjointIntervals_ShouldMaintainSorted() {
@@ -72,6 +97,54 @@ class IntervalManagerTest {
     }
 
     @Test
+    void addInterval_WithSameStartAndEndMerging_ShouldMergeCorrectly() {
+        IntervalManager manager = new IntervalManager();
+
+        // Add a single point interval
+        manager.addInterval(new int[]{5, 5});
+
+        // Add adjacent interval before
+        manager.addInterval(new int[]{3, 5});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{3, 5}});
+
+        // Add adjacent interval after
+        manager = new IntervalManager();
+        manager.addInterval(new int[]{5, 5});
+        manager.addInterval(new int[]{5, 7});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{5, 7}});
+
+        // Add interval that contains the point
+        manager = new IntervalManager();
+        manager.addInterval(new int[]{5, 5});
+        manager.addInterval(new int[]{4, 6});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{4, 6}});
+    }
+
+    @Test
+    void removeInterval_WithNullInput_ShouldThrowIllegalArgumentException() {
+        IntervalManager manager = new IntervalManager();
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> manager.removeInterval(null));
+        assertEquals("Interval must have length 2", exception.getMessage());
+    }
+
+    @Test
+    void removeInterval_WithWrongLength_ShouldThrowIllegalArgumentException() {
+        IntervalManager manager = new IntervalManager();
+        Exception exception1 = assertThrows(IllegalArgumentException.class, () -> manager.addInterval(new int[]{1}));
+        assertEquals("Interval must have length 2", exception1.getMessage());
+
+        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> manager.addInterval(new int[]{1, 2, 3}));
+        assertEquals("Interval must have length 2", exception2.getMessage());
+    }
+
+    @Test
+    void removeInterval_WithStartGreaterThanEnd_ShouldThrowIllegalArgumentException() {
+        IntervalManager manager = new IntervalManager();
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> manager.addInterval(new int[]{5, 3}));
+        assertEquals("Start must be less than or equal to end", exception.getMessage());
+    }
+
+    @Test
     void removeInterval_WhenNoOverlap_ShouldNotModifyIntervals() {
         IntervalManager manager = new IntervalManager();
         manager.addInterval(new int[]{1, 5});
@@ -120,6 +193,34 @@ class IntervalManagerTest {
         manager.addInterval(new int[]{10, 15}); // should trim start
         manager.removeInterval(new int[]{6, 12});
         assertIntervalsEqual(manager.getIntervals(), new int[][]{{1, 3}, {5, 6}, {12, 15}});
+    }
+
+    @Test
+    void removeInterval_WithSameStartAndEnd_ShouldRemovePointCorrectly() {
+        IntervalManager manager = new IntervalManager();
+
+        // Remove point from point interval
+        manager.addInterval(new int[]{5, 5});
+        manager.removeInterval(new int[]{5, 5});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{});
+
+        // Remove point from larger interval
+        manager = new IntervalManager();
+        manager.addInterval(new int[]{3, 7});
+        manager.removeInterval(new int[]{5, 5});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{3, 5}, {5, 7}});
+
+        // Remove point at start of interval
+        manager = new IntervalManager();
+        manager.addInterval(new int[]{3, 7});
+        manager.removeInterval(new int[]{3, 3});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{3, 7}});
+
+        // Remove point at end of interval
+        manager = new IntervalManager();
+        manager.addInterval(new int[]{3, 7});
+        manager.removeInterval(new int[]{7, 7});
+        assertIntervalsEqual(manager.getIntervals(), new int[][]{{3, 7}});
     }
 
     private void assertIntervalsEqual(List<int[]> actual, int[][] expected) {
