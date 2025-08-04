@@ -14,20 +14,20 @@ The Interval Manager is a utility for handling time intervals(integers). It prov
 
 ### Prerequisites
 - Java 21 or higher
-- Maven 3.6 or higher
+- The project includes Maven Wrapper, so don't need to install Maven separately.
 
 ### Installation
 
-Build the project with Maven:
+Build
 ```bash
-mvn clean install
+./mvnw clean install
 ```
 
 ### Running Tests
 
-Run the tests using Maven:
+Run tests:
 ```bash
-mvn test
+./mvnw test
 ```
 
 ## Usage Examples
